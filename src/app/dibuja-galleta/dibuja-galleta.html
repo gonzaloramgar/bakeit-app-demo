@@ -1,0 +1,22 @@
+<div class="draw-container">
+  <button class="back-btn" routerLink="/">⬅ Volver al Inicio</button>
+  
+  <h2>Dibuja tu Galleta</h2>
+  <p class="subtitle">El ganador del concurso pasará a ganar una galleta con la forma que dibujó.</p>
+
+  <div class="canvas-area">
+    <canvas #canvasElement 
+            width="400" 
+            height="400" 
+            (mousedown)="iniciarDibujo($event)"
+            (mouseup)="detenerDibujo()"
+            (mousemove)="dibujar($event)"
+            (mouseleave)="detenerDibujo()">
+    </canvas>
+  </div>
+  
+  <div class="action-btns">
+    <button class="btn-borrar" (click)="limpiarCanvas()">Borrar dibujo</button>
+    <button class="btn-enviar">Enviar mi diseño</button>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<div class="ia-page">
+  <header class="ia-topbar">
+    <a routerLink="/" class="ia-brand"><span class="ia-logo">B</span><span>Bake<span>IT</span></span></a>
+    <a routerLink="/" class="back-link">← Volver a explorar</a>
+  </header>
+
+  <main class="ia-main">
+    <p class="eyebrow">BUSCA A TU MANERA</p>
+    <h1>Cuéntanos qué te apetece.</h1>
+    <p class="intro">Escribe lo que buscas con tus palabras. El buscador puede reconocer el tipo de producto, el precio máximo, la cercanía y si quieres priorizar la clasificación nutricional.</p>
+
+    <form class="prompt-panel" (ngSubmit)="buscar()">
+      <label for="consulta-personalizada">¿Qué panadería o producto estás buscando?</label>
+      <textarea id="consulta-personalizada" name="consulta" [(ngModel)]="consulta" rows="4" placeholder="Quiero panaderías cerca, por menos de 5 € y que los bollos de chocolate sean lo más sanos posible"></textarea>
+      <div class="prompt-actions">
+        <button type="button" class="example-button" (click)="usarEjemplo()">Rellenar ejemplo</button>
+        <button type="submit" class="send-button" [disabled]="!consulta.trim()">Ver resultados <span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+
+    <div class="feature-row">
+      <article><span class="feature-icon">⌖</span><div><h2>Cerca de ti</h2><p>Limita la búsqueda por distancia.</p></div></article>
+      <article><span class="feature-icon">€</span><div><h2>Según tu presupuesto</h2><p>Compara productos dentro de tu precio.</p></div></article>
+      <article><span class="feature-icon">A–E</span><div><h2>Información nutricional</h2><p>Consulta valores orientativos y alérgenos.</p></div></article>
+    </div>
+
+    <p class="demo-warning"><strong>Nota:</strong> esta es una búsqueda inteligente de demostración basada en reglas sencillas, no una IA conectada a un modelo externo. Los comercios, precios y datos nutricionales son ficticios y deben verificarse antes de usar la aplicación en la vida real.</p>
+  </main>
+</div>

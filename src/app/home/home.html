@@ -1,0 +1,152 @@
+<div class="page-shell">
+  <header class="topbar">
+    <a class="brand" routerLink="/" aria-label="BakeIT, inicio">
+      <span class="brand-mark">B</span>
+      <span>Bake<span>IT</span><small>Tu próxima panadería, mejor elegida</small></span>
+    </a>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a class="active" routerLink="/">Explorar</a>
+      <a routerLink="/ia">Buscar por necesidades</a>
+      <a routerLink="/dibujar">Diseña una galleta</a>
+      <a class="bakery-portal-link" routerLink="/panaderias">Portal panaderías</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">PANADERÍAS LOCALES · INGREDIENTES · NUTRICIÓN</p>
+        <h1>Encuentra algo rico.<br><span>Elige con información.</span></h1>
+        <p class="hero-text">Compara panaderías cercanas y encuentra los productos que encajan con tu presupuesto y tus preferencias alimentarias.</p>
+      </div>
+      <div class="hero-stamp" aria-hidden="true">
+        <span>Hecho para</span>
+        <strong>disfrutar<br>mejor</strong>
+        <span class="stamp-line">BakeIT · LOCAL</span>
+      </div>
+    </section>
+
+    <section class="search-panel" aria-labelledby="search-title">
+      <div class="search-heading">
+        <div>
+          <p class="eyebrow">BUSCADOR INTELIGENTE</p>
+          <h2 id="search-title">¿Qué te apetece encontrar?</h2>
+          <p>Escribe como hablarías normalmente o ajusta los filtros.</p>
+        </div>
+        <button type="button" class="example-button" (click)="probarEjemplo()">Probar ejemplo ↗</button>
+      </div>
+
+      <form class="search-form" (ngSubmit)="buscar()">
+        <div class="query-box">
+          <span class="search-symbol" aria-hidden="true">⌕</span>
+          <input name="consulta" type="text" aria-label="Describe la panadería o el producto que buscas" [(ngModel)]="consulta" placeholder="Ej. Bollos de chocolate cerca, por menos de 5 € y lo más saludables posible">
+          <button type="submit" class="search-button">Buscar</button>
+        </div>
+
+        <div class="filter-row">
+          <label class="filter-control">
+            <span>Presupuesto máximo</span>
+            <span class="input-with-suffix"><input name="presupuesto" type="number" min="0" step="0.5" [(ngModel)]="presupuestoMaximo" placeholder="Sin límite"><b>€</b></span>
+          </label>
+          <label class="filter-control">
+            <span>Distancia máxima</span>
+            <select name="radio" [(ngModel)]="radioKm">
+              <option [ngValue]="1">1 km</option>
+              <option [ngValue]="3">3 km</option>
+              <option [ngValue]="5">5 km</option>
+              <option [ngValue]="10">10 km</option>
+            </select>
+          </label>
+          <label class="health-toggle">
+            <input type="checkbox" name="saludable" [(ngModel)]="priorizarSaludable" (ngModelChange)="cambiarOrden($event ? 'salud' : 'distancia')">
+            <span class="toggle-copy"><strong>Priorizar nutrición</strong><small>Ordenar las mejores clasificaciones primero</small></span>
+          </label>
+          <button type="button" class="clear-button" (click)="limpiarFiltros()">Limpiar filtros</button>
+        </div>
+      </form>
+
+      <div class="demo-note"><span class="note-icon">i</span><span><strong>Prototipo académico:</strong> panaderías, distancias, precios y valores nutricionales de esta pantalla son datos ficticios de demostración. La clasificación A–E es orientativa (A: mejor perfil comparativo de esta demo; E: menos favorable), no oficial ni verificada por los establecimientos.</span></div>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-title">
+      <div class="results-header">
+        <div>
+          <p class="eyebrow">DESCUBRE TU PRÓXIMA PARADA</p>
+          <h2 id="results-title">Panaderías para ti <span class="result-count">{{ resultados.length }}</span></h2>
+          <p class="results-subtitle" *ngIf="consultaAplicada">Búsqueda: “{{ consultaAplicada }}”</p>
+          <p class="results-subtitle" *ngIf="!consultaAplicada">Comercios de ejemplo en distintas zonas de Getafe.</p>
+        </div>
+        <label class="sort-control">
+          <span>Ordenar por</span>
+          <select [value]="ordenarPor" (change)="cambiarOrden($any($event.target).value)">
+            <option value="distancia">Más cercanas</option>
+            <option value="salud">Mejor nutrición</option>
+            <option value="precio">Precio más bajo</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="empty-state" *ngIf="resultados.length === 0">
+        <span class="empty-icon">⌕</span>
+        <h3>No encontramos coincidencias</h3>
+        <p>Prueba a aumentar la distancia, subir el presupuesto o quitar algún término de la búsqueda.</p>
+        <button type="button" (click)="limpiarFiltros()" class="search-button">Mostrar todas</button>
+      </div>
+
+      <div class="bakery-list" *ngIf="resultados.length > 0">
+        <article class="bakery-card" *ngFor="let resultado of resultados">
+          <div class="bakery-topline">
+            <div class="bakery-avatar" aria-hidden="true">{{ resultado.panaderia.nombre.charAt(0) }}</div>
+            <div class="bakery-info">
+              <div class="bakery-title-line">
+                <h3>{{ resultado.panaderia.nombre }}</h3>
+                <span class="demo-pill">Perfil demo</span>
+              </div>
+              <p class="bakery-location"><span aria-hidden="true">⌖</span> {{ resultado.panaderia.zona }} <span class="dot">·</span> {{ resultado.panaderia.distanciaKm | number:'1.1-1' }} km</p>
+              <p class="bakery-description">{{ resultado.panaderia.descripcion }}</p>
+            </div>
+            <div class="bakery-summary">
+              <span class="summary-label">Desde</span>
+              <strong>{{ precioMinimo(resultado.productos) }} €</strong>
+              <small>{{ resultado.productos.length }} producto{{ resultado.productos.length === 1 ? '' : 's' }}</small>
+            </div>
+          </div>
+
+          <div class="products-heading">
+            <h4>Productos que encajan</h4>
+            <span *ngIf="priorizarSaludable || ordenarPor === 'salud'">Mejor clasificados primero</span>
+          </div>
+
+          <div class="product-list">
+            <article class="product-card" *ngFor="let producto of resultado.productos">
+              <div class="product-photo"><img [src]="producto.imagen" [alt]="producto.nombre" loading="lazy"></div>
+              <div class="product-details">
+                <div class="product-name-line">
+                  <h5>{{ producto.nombre }}</h5>
+                  <strong class="product-price">{{ producto.precio | number:'1.2-2' }} €</strong>
+                </div>
+                <p class="product-category">{{ producto.categoria }} · información estimada por 100 g</p>
+                <div class="nutrition-line">
+                  <span class="nutrition-grade grade-{{ producto.clasificacion | lowercase }}" [attr.aria-label]="'Clasificación orientativa ' + producto.clasificacion">{{ producto.clasificacion }}</span>
+                  <span>{{ producto.kcal }} kcal</span>
+                  <span>Azúcares {{ producto.azucares }} g</span>
+                  <span>Sat. {{ producto.grasasSaturadas }} g</span>
+                  <span>Proteínas {{ producto.proteinas }} g</span>
+                  <span>Fibra {{ producto.fibra }} g</span>
+                  <span>Sal {{ producto.sal }} g</span>
+                </div>
+                <p class="product-allergens"><strong>Alérgenos:</strong> {{ producto.alergenos.join(', ') }}</p>
+              </div>
+            </article>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="footer-brand" routerLink="/">BakeIT</a>
+    <span>Una forma más informada de descubrir panaderías locales.</span>
+    <a routerLink="/panaderias">¿Tienes una panadería? Gestiona tu perfil →</a>
+  </footer>
+</div>

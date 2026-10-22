@@ -1,0 +1,121 @@
+<div class="merchant-shell">
+  <header class="merchant-header">
+    <a class="merchant-brand" routerLink="/" aria-label="BakeIT, volver al buscador">
+      <span class="merchant-brand-mark">B</span>
+      <span>Bake<span>IT</span><small>Portal para panaderías</small></span>
+    </a>
+    <nav aria-label="Navegación del portal">
+      <a routerLink="/">Vista de clientes</a>
+      <span class="merchant-user"><span class="user-mark">{{ nombre.charAt(0) }}</span> {{ nombre }}</span>
+    </nav>
+  </header>
+
+  <main>
+    <section class="merchant-welcome">
+      <div>
+        <p class="merchant-eyebrow">TU ESPACIO EN BAKEIT</p>
+        <h1>Tu panadería,<br><span>a tu manera.</span></h1>
+        <p class="welcome-copy">Gestiona lo que ven tus clientes, comparte promociones y haz crecer tu presencia local.</p>
+      </div>
+      <button class="add-bakery-button" type="button" (click)="registroAbierto = !registroAbierto">
+        {{ registroAbierto ? 'Cerrar formulario' : '+ Añadir panadería' }}
+      </button>
+    </section>
+
+    <p class="demo-disclaimer"><strong>Vista de demostración.</strong> Los cambios solo se mantienen durante esta sesión; el registro, los pagos y la publicación real todavía no están conectados.</p>
+
+    <section class="registration-panel" *ngIf="registroAbierto" aria-labelledby="registration-title">
+      <div>
+        <p class="merchant-eyebrow">NUEVO PERFIL</p>
+        <h2 id="registration-title">Registra otra panadería</h2>
+      </div>
+      <form (ngSubmit)="registrarPanaderia()">
+        <label>Nombre del negocio<input name="nombreNuevo" [(ngModel)]="nombreNuevo" required placeholder="Ej. Obrador La Espiga"></label>
+        <label>Zona o localidad<input name="zonaNueva" [(ngModel)]="zonaNueva" required placeholder="Ej. Getafe Centro"></label>
+        <button type="submit">Crear perfil de demostración</button>
+      </form>
+    </section>
+
+    <div class="toast" role="status" *ngIf="aviso">{{ aviso }}</div>
+
+    <section class="merchant-stats" aria-label="Resumen de la panadería">
+      <article><span>Visitas al perfil</span><strong>1.248</strong><small>Últimos 30 días · dato de ejemplo</small></article>
+      <article><span>Personas interesadas</span><strong>86</strong><small>Guardaron tu panadería · demo</small></article>
+      <article><span>Productos visibles</span><strong>{{ productosVisibles }}<i> / {{ productos.length }}</i></strong><small>En el buscador de clientes</small></article>
+      <article><span>Promoción</span><strong>{{ promocionActiva ? 'Activa' : 'Pausada' }}</strong><small>Controlada por tu negocio</small></article>
+    </section>
+
+    <div class="merchant-layout">
+      <div class="merchant-main-column">
+        <section class="merchant-panel profile-panel" aria-labelledby="profile-title">
+          <div class="panel-heading">
+            <div><p class="merchant-eyebrow">PRESENCIA LOCAL</p><h2 id="profile-title">Perfil de tu panadería</h2></div>
+            <span class="profile-status"><span></span> Visible en el buscador</span>
+          </div>
+          <div class="profile-content">
+            <div class="profile-avatar" aria-hidden="true">{{ nombre.charAt(0) }}</div>
+            <div class="profile-fields" *ngIf="!editandoPerfil">
+              <h3>{{ nombre }}</h3>
+              <p class="profile-location">{{ zona }}</p>
+              <p>{{ descripcion }}</p>
+            </div>
+            <div class="profile-fields profile-edit-fields" *ngIf="editandoPerfil">
+              <label>Nombre<input name="nombre" [(ngModel)]="nombre"></label>
+              <label>Zona<input name="zona" [(ngModel)]="zona"></label>
+              <label>Descripción<textarea name="descripcion" [(ngModel)]="descripcion" rows="2"></textarea></label>
+            </div>
+            <button class="text-action" type="button" (click)="editandoPerfil = !editandoPerfil" *ngIf="!editandoPerfil">Editar perfil</button>
+          </div>
+          <div class="profile-actions" *ngIf="editandoPerfil"><button type="button" class="quiet-button" (click)="editandoPerfil = false">Cancelar</button><button type="button" class="primary-button" (click)="guardarPerfil()">Guardar cambios</button></div>
+        </section>
+
+        <section class="merchant-panel products-panel" aria-labelledby="products-title">
+          <div class="panel-heading">
+            <div><p class="merchant-eyebrow">CATÁLOGO</p><h2 id="products-title">Productos</h2></div>
+            <button type="button" class="text-action" (click)="aviso = 'La creación de productos estará disponible próximamente.'">+ Añadir producto</button>
+          </div>
+          <p class="panel-intro">Actualiza la disponibilidad para que los clientes encuentren opciones al día.</p>
+          <div class="product-row" *ngFor="let producto of productos">
+            <span class="product-symbol" aria-hidden="true">✳</span>
+            <div class="product-copy"><strong>{{ producto.nombre }}</strong><small>{{ producto.precio | number:'1.2-2' }} € · precio de ejemplo</small></div>
+            <span class="product-state" [class.is-paused]="!producto.disponible">{{ producto.disponible ? 'Visible' : 'Pausado' }}</span>
+            <button class="visibility-button" type="button" [attr.aria-label]="(producto.disponible ? 'Pausar ' : 'Mostrar ') + producto.nombre" (click)="alternarProducto(producto)">{{ producto.disponible ? 'Pausar' : 'Mostrar' }}</button>
+          </div>
+        </section>
+
+        <section class="merchant-panel promotion-panel" aria-labelledby="promotion-title">
+          <div class="panel-heading">
+            <div><p class="merchant-eyebrow">ACTIVA EL MOVIMIENTO</p><h2 id="promotion-title">Promoción especial</h2></div>
+            <label class="switch-control">
+              <input type="checkbox" [(ngModel)]="promocionActiva" (ngModelChange)="guardarPromocion()" aria-label="Activar promoción especial">
+              <span class="switch-track"></span>
+            </label>
+          </div>
+          <p class="panel-intro">Comparte una oferta con quienes buscan algo rico cerca de tu panadería.</p>
+          <label class="promotion-input">Texto de la promoción<input name="textoPromocion" [(ngModel)]="textoPromocion" [disabled]="!promocionActiva"></label>
+          <div class="promotion-footer"><span [class.active-promotion]="promocionActiva">{{ promocionActiva ? 'Se mostrará en tu perfil' : 'Promoción pausada' }}</span><button type="button" class="quiet-button" [disabled]="!promocionActiva" (click)="guardarPromocion()">Guardar promoción</button></div>
+        </section>
+      </div>
+
+      <aside class="merchant-side-column">
+        <section class="highlight-panel" aria-labelledby="highlight-title">
+          <p class="merchant-eyebrow">MÁS VISIBILIDAD</p>
+          <h2 id="highlight-title">Que te encuentren antes.</h2>
+          <p>Destaca tu panadería en los resultados y llega a más clientes de tu zona.</p>
+          <ul><li>Posición destacada en búsquedas locales</li><li>Identificación visible como panadería destacada</li><li>Opciones para quitar anuncios</li></ul>
+          <button type="button" class="highlight-button" (click)="opcionesDestacadoAbiertas = !opcionesDestacadoAbiertas">{{ opcionesDestacadoAbiertas ? 'Ocultar opciones' : 'Ver opciones de destacado' }}</button>
+          <div class="highlight-details" *ngIf="opcionesDestacadoAbiertas"><strong>Suscripción para destacados</strong><span>Precio y condiciones por definir.</span><small>Los pagos y la activación todavía no están disponibles en esta versión.</small></div>
+        </section>
+
+        <section class="side-note">
+          <span class="note-index">01</span>
+          <h3>Tu negocio, tus decisiones.</h3>
+          <p>El portal está pensado para que cada panadería pueda mantener su información y sus ofertas al día.</p>
+        </section>
+        <a class="back-to-search" routerLink="/">← Volver al buscador de clientes</a>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="merchant-footer"><a routerLink="/">BakeIT</a><span>Portal de gestión para panaderías</span><span>Prototipo · sin cuentas ni pagos reales</span></footer>
+</div>
