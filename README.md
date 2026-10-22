@@ -2,6 +2,12 @@
 
 ## Ejecutar el proyecto
 
+Primero necesitas clonar el repositorio usando en la terminal
+
+```bash
+git clone https://github.com/gonzaloramgar/bakeit-app-demo.git
+cd bakeit-app-demo
+```
 Necesitas tener Node.js y npm instalados. Abre una terminal en la carpeta del proyecto y ejecuta:
 
 ```bash
